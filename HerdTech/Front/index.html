@@ -1,0 +1,210 @@
+<!DOCTYPE html> 
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>HerdTech - Gestão Inteligente de Rebanho</title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <header class="navbar">
+            <img src="Logo.png" alt="LogoHerdTech">
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#" class="active" data-tab="inicio">Início</a></li>
+                    <li><a href="#" data-tab="fazendas">Fazendas</a></li>
+                    <li><a href="#" data-tab="animais">Animais</a></li>
+                    <li><a href="#" data-tab="vacinas">Vacinação</a></li>
+                    <li><a href="#" data-tab="relatorios">Relatórios</a></li>
+                </ul>
+            </nav>
+            <div class="user-profile">
+                <div class="notification-icon">
+                    <i class="fa-regular fa-bell"></i>
+                    <span class="badge">3</span>
+                </div>
+                <div class="user-meta">
+                    <strong>Guilherme</strong>
+                    <span class="role">Administrador</span>
+                </div>
+            </div>
+        </header>
+        <!-- Visível apenas na aba Início -->
+        <section class="hero" data-show="inicio">
+            <div class="hero-text">
+                <span class="tag">TECNOLOGIA NO CAMPO</span>
+                <h1>Gestão inteligente <br> Tecnologia para um <br> <span>rebanho mais produtivo</span></h1>
+                <p>Controle completo do seu rebanho, fazendas e histórico sanitário em um só lugar.</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" id="btn-add-animal">Cadastrar Animal</button>
+                    <button class="btn btn-secondary" id="btn-add-fazenda">Cadastrar Fazenda</button>
+                    <button class="btn btn-vaccine" id="btn-add-vacina"><i class="fa-solid fa-syringe"></i> Aplicar Vacina</button>
+                </div>
+            </div>
+            <div class="hero-graphics">
+                <div class="bull-container">
+                    <div class="lucro-badge">
+                        <div>+ Produtividade</div>
+                        <div>- Custo</div>
+                        <div class="divider"></div>
+                        <div class="lucro-total">= Mais Lucro</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Visível apenas na aba Início -->
+        <section class="metrics-section" data-show="inicio">
+            <div class="kpi-card">
+                <div class="kpi-icon"><i class="fa-solid fa-cow"></i></div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Total de Animais</span>
+                    <span class="kpi-value" id="kpi-total-animais">0</span>
+                    <span class="kpi-sub">Geral</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon"><i class="fa-solid fa-glass-water"></i></div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Vacas de Leite</span>
+                    <span class="kpi-value" id="kpi-vacas-leite">0</span>
+                    <span class="kpi-sub">Produção</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon"><i class="fa-solid fa-drumstick-bite"></i></div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Vacas de Corte</span>
+                    <span class="kpi-value" id="kpi-vacas-corte">0</span>
+                    <span class="kpi-sub">Engorda</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="color: var(--status-breve); background-color: rgba(52, 152, 219, 0.1);"><i class="fa-solid fa-syringe"></i></div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Total de Vacinas</span>
+                    <span class="kpi-value" id="kpi-total-vacinas">0</span>
+                    <span class="kpi-sub highlight" style="background-color: rgba(52, 152, 219, 0.1); color: var(--status-breve);">Aplicadas</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon"><i class="fa-solid fa-location-dot"></i></div>
+                <div class="kpi-info">
+                    <span class="kpi-label">Fazendas</span>
+                    <span class="kpi-value" id="kpi-total-fazendas">0</span>
+                    <span class="kpi-sub highlight">Ativas</span>
+                </div>
+            </div>
+        </section>
+        <!-- Painéis: cada um declara em quais abas aparece via data-show -->
+        <section class="content-dashboard triple-grid" id="dashboard">
+            <div class="panel" data-show="inicio fazendas">
+                <div class="panel-header">
+                    <h3>Gerenciar Fazendas</h3>
+                    <button class="btn-add-mini" data-add="fazenda"><i class="fa-solid fa-plus"></i> Nova</button>
+                </div>
+                <div class="activity-list" id="lista-fazendas-completas"></div>
+            </div>
+            <div class="panel" data-show="inicio animais">
+                <div class="panel-header">
+                    <h3>Gerenciar Animais</h3>
+                    <button class="btn-add-mini" data-add="animal"><i class="fa-solid fa-plus"></i> Novo</button>
+                </div>
+                <div class="activity-list" id="lista-animais-recente"></div>
+            </div>
+            <div class="panel highlight-panel" data-show="inicio vacinas">
+                <div class="panel-header">
+                    <h3>Registro de Vacinação</h3>
+                    <button class="btn-add-mini" data-add="vacina"><i class="fa-solid fa-plus"></i> Aplicar</button>
+                </div>
+                <div class="activity-list" id="lista-vacinas-completas"></div>
+            </div>
+            <!-- Aba Relatórios -->
+            <div class="panel" data-show="relatorios">
+                <h3>Animais por Fazenda</h3>
+                <div class="activity-list" id="relatorio-fazendas"></div>
+            </div>
+            <div class="panel" data-show="relatorios">
+                <h3>Situação Sanitária</h3>
+                <div class="activity-list" id="relatorio-sanitario"></div>
+            </div>
+            <div class="panel" data-show="relatorios">
+                <h3>Composição do Rebanho</h3>
+                <div class="activity-list" id="relatorio-composicao"></div>
+            </div>
+        </section>
+        <div class="modal" id="modal-animal">
+            <div class="modal-content">
+                <h3 id="modal-animal-titulo">Novo Animal</h3>
+                <form id="form-animal">
+                    <input type="hidden" id="edit-animal-id">
+                    <div class="form-group">
+                        <label>Identificação / Brinco</label>
+                        <input type="text" id="animal-brinco" required placeholder="Ex: BR-4502">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Aptidão</label>
+                        <select id="animal-tipo" required>
+                            <option value="Leite">Vaca de Leite</option>
+                            <option value="Corte">Vaca de Corte</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Fazenda Alocada</label>
+                        <select id="animal-fazenda" required></select>
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="button" class="btn btn-cancel" id="btn-fechar-animal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="modal" id="modal-fazenda">
+            <div class="modal-content">
+                <h3 id="modal-fazenda-titulo">Nova Fazenda</h3>
+                <form id="form-fazenda">
+                    <input type="hidden" id="edit-fazenda-id">
+                    <div class="form-group">
+                        <label>Nome da Fazenda</label>
+                        <input type="text" id="fazenda-nome" required placeholder="Ex: Fazenda Boa Vista">
+                    </div>
+                    <div class="form-group">
+                        <label>Localização / Cidade</label>
+                        <input type="text" id="fazenda-local" required placeholder="Ex: Uberaba - MG">
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="button" class="btn btn-cancel" id="btn-fechar-fazenda">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="modal" id="modal-vacina">
+            <div class="modal-content">
+                <h3 id="modal-vacina-titulo">Registrar Aplicação de Vacina</h3>
+                <form id="form-vacina">
+                    <input type="hidden" id="edit-vacina-id">
+                    <div class="form-group">
+                        <label>Nome da Vacina / Medicamento</label>
+                        <input type="text" id="vacina-nome" required placeholder="Ex: Febre Aftosa, Brucelose">
+                    </div>
+                    <div class="form-group">
+                        <label>Animal Aplicado (Brinco)</label>
+                        <select id="vacina-animal" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Aplicação</label>
+                        <input type="date" id="vacina-data" required>
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="button" class="btn btn-cancel" id="btn-fechar-vacina">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Registrar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script src="script.js"></script>
+    </body>
+</html>
