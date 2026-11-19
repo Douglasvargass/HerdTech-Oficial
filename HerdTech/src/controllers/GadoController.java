@@ -27,7 +27,8 @@ public class GadoController {
         gadoView.aoNovo(this::cadastrar);
         gadoView.aoEditar(this::alterar);
         gadoView.aoExcluir(this::excluir);
-        gadoView.aoAtualizar(aoAlterarDados);
+        // Só o clique do usuário em "Atualizar" conta como consulta na auditoria
+        gadoView.aoAtualizar(() -> dao.AuditoriaDAO.comoConsulta(aoAlterarDados));
     }
 
     public void cadastrar() {

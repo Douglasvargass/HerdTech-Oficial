@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class ClienteDAO {
 
@@ -25,11 +27,19 @@ public class ClienteDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro no banco: " + e.getMessage());
         }
+        AuditoriaDAO.registrar(AuditoriaDAO.CONSULTA, "Cliente", null, "Listagem de clientes: " + lista.size() + " registro(s)");
         return lista;
     }
 
     // Busca um cliente pelo id (retorna null se não existir)
     public Cliente buscarPorId(Integer id) {
+        Cliente cliente = buscar(id);
+        AuditoriaDAO.registrar(AuditoriaDAO.CONSULTA, "Cliente", id, cliente == null ? "Consulta por id: não encontrado" : "Consulta por id: " + AuditoriaDAO.resumo(campos(cliente)));
+        return cliente;
+    }
+
+    // Busca sem gerar log (usada para guardar o "antes" das alterações)
+    private Cliente buscar(Integer id) {
         String sql = "SELECT * FROM cliente WHERE id = ?";
 
         try (Connection con = Conexao.conectar();
@@ -63,6 +73,7 @@ public class ClienteDAO {
             try (ResultSet chaves = ps.getGeneratedKeys()) {
                 if (chaves.next()) cliente.setId(chaves.getInt(1));
             }
+            AuditoriaDAO.registrar(AuditoriaDAO.INCLUSAO, "Cliente", cliente.getId(), "Registro incluído:\n" + AuditoriaDAO.lista(campos(cliente)));
             return true;
         } catch (SQLException e) {
             throw new RuntimeException("Erro no banco: " + e.getMessage());
@@ -83,7 +94,10 @@ public class ClienteDAO {
             ps.setString(5, cliente.getEndereco());
             ps.setInt(6, cliente.getId());
 
-            return ps.executeUpdate() > 0;
+            Map<String, String> antes = campos(buscar(cliente.getId()));
+            boolean ok = ps.executeUpdate() > 0;
+            if (ok) AuditoriaDAO.registrar(AuditoriaDAO.ALTERACAO, "Cliente", cliente.getId(), "Campos alterados:\n" + AuditoriaDAO.diferencas(antes, campos(cliente)));
+            return ok;
         } catch (SQLException e) {
             throw new RuntimeException("Erro no banco: " + e.getMessage());
         }
@@ -97,7 +111,10 @@ public class ClienteDAO {
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
+            Map<String, String> antes = campos(buscar(id));
+            boolean ok = ps.executeUpdate() > 0;
+            if (ok) AuditoriaDAO.registrar(AuditoriaDAO.EXCLUSAO, "Cliente", id, "Registro excluído:\n" + AuditoriaDAO.lista(antes));
+            return ok;
         } catch (SQLException e) {
             throw new RuntimeException("Erro no banco (o cliente pode ter gado cadastrado): " + e.getMessage());
         }
@@ -113,5 +130,17 @@ public class ClienteDAO {
                 rs.getString("nome_fazenda"),
                 rs.getString("endereco")
         );
+    }
+
+    // Campos do cliente para o log de auditoria
+    private Map<String, String> campos(Cliente c) {
+        Map<String, String> m = new LinkedHashMap<>();
+        if (c == null) return m;
+        m.put("Nome", c.getNome());
+        m.put("CPF", String.valueOf(c.getCpf()));
+        m.put("Nascimento", c.getDataNasc());
+        m.put("Fazenda", c.getNomeFazenda());
+        m.put("Endereço", c.getEndereco());
+        return m;
     }
 }

@@ -9,6 +9,9 @@ import services.GadoService;
 import views.*;
 import views.componentes.Alerta;
 import views.componentes.Icones;
+import dao.NotificacaoBanco;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import java.util.List;
 
@@ -19,6 +22,7 @@ public class HerdTechController {
     private static final String ANIMAIS = "animais";
     private static final String VACINAS = "vacinas";
     private static final String RELATORIOS = "relatorios";
+    private static final String AUDITORIA = "auditoria";
 
     private final HerdTechView herdTechView = new HerdTechView();
     private final InicioView inicioView = new InicioView();
@@ -26,6 +30,7 @@ public class HerdTechController {
     private final GadoView gadoView = new GadoView();
     private final AplicacaoView aplicacaoView = new AplicacaoView();
     private final RelatorioView relatorioView = new RelatorioView();
+    private final AuditoriaView auditoriaView = new AuditoriaView();
 
     private final ClienteService clienteService = new ClienteService();
     private final GadoService gadoService = new GadoService();
@@ -34,6 +39,13 @@ public class HerdTechController {
     private final ClienteController clienteController = new ClienteController(clienteView, this::atualizarDados);
     private final GadoController gadoController = new GadoController(gadoView, this::atualizarDados);
     private final AplicacaoController aplicacaoController = new AplicacaoController(aplicacaoView, this::atualizarDados);
+
+    private final AuditoriaController auditoriaController = new AuditoriaController(auditoriaView);
+
+    // Atualização automática: o banco avisa quando algo muda; juntamos avisos seguidos em uma só atualização
+    private final Timer atualizacaoAgendada = new Timer(500, e -> atualizarPorAviso());
+    private final NotificacaoBanco notificacaoBanco = new NotificacaoBanco(
+            () -> SwingUtilities.invokeLater(() -> atualizacaoAgendada.restart()));
 
     private boolean erroJaExibido;
 
@@ -44,6 +56,11 @@ public class HerdTechController {
         herdTechView.adicionarTela(ANIMAIS, "Animais", cor -> Icones.gado(18, cor), gadoView);
         herdTechView.adicionarTela(VACINAS, "Vacinação", cor -> Icones.seringa(17, cor), aplicacaoView);
         herdTechView.adicionarTela(RELATORIOS, "Relatórios", cor -> Icones.grafico(17, cor), relatorioView);
+        herdTechView.adicionarTela(AUDITORIA, "Auditoria", cor -> Icones.busca(17, cor), auditoriaView);
+        // Recarrega o histórico sempre que a aba Auditoria é aberta
+        herdTechView.aoTrocarTela(id -> {
+            if (AUDITORIA.equals(id)) auditoriaController.carregar();
+        });
 
         // Atalhos da tela inicial
         inicioView.aoCadastrarAnimal(() -> {
@@ -62,7 +79,15 @@ public class HerdTechController {
         herdTechView.aoClicarNotificacoes(() -> herdTechView.mostrarTela(VACINAS));
 
         herdTechView.setVisible(true);
+        atualizacaoAgendada.setRepeats(false);
         atualizarDados();
+        notificacaoBanco.iniciar();
+    }
+
+    // Recarrega tudo (leituras automáticas não entram na auditoria)
+    private void atualizarPorAviso() {
+        atualizarDados();
+        auditoriaController.carregar();
     }
 
     // Busca tudo no banco e atualiza todas as telas

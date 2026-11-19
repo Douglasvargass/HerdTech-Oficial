@@ -9,7 +9,7 @@ import javax.swing.JPasswordField;
 public class Conexao {
 
     // Dados de acesso ao banco (ajuste conforme o seu PostgreSQL)
-    private static final String URL = "jdbc:postgresql://ep-summer-leaf-b6p0fxz2-pooler.c-2.sa-east-1.aws.neon.tech:5432/herdtech";
+    private static final String URL = "jdbc:postgresql://ep-summer-leaf-b6p0fxz2-pooler.c-2.sa-east-1.aws.neon.tech:5432/herdtechdb";
     private static final String USUARIO = "neondb_owner";
 
     // A senha é digitada numa janela e fica guardada só enquanto o programa está aberto
@@ -32,6 +32,14 @@ public class Conexao {
             }
             throw e;
         }
+    }
+
+    // Conexão direta (sem o pooler do Neon). Necessária para LISTEN/NOTIFY, que não funciona através do pooler.
+    public static Connection conectarDireto() throws SQLException {
+        if (senha == null) {
+            throw new SQLException("Senha do banco ainda não informada.");
+        }
+        return DriverManager.getConnection(URL.replace("-pooler", ""), USUARIO, senha);
     }
 
     // Mostra uma janela para digitar a senha (campo escondido)

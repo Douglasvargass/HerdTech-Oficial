@@ -25,7 +25,8 @@ public class AplicacaoController {
         aplicacaoView.aoNovo(this::cadastrar);
         aplicacaoView.aoEditar(this::alterar);
         aplicacaoView.aoExcluir(this::excluir);
-        aplicacaoView.aoAtualizar(aoAlterarDados);
+        // Só o clique do usuário em "Atualizar" conta como consulta na auditoria
+        aplicacaoView.aoAtualizar(() -> dao.AuditoriaDAO.comoConsulta(aoAlterarDados));
     }
 
     public void cadastrar() {

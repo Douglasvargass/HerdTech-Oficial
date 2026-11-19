@@ -9,6 +9,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class AplicacaoDAO {
 
@@ -35,11 +37,19 @@ public class AplicacaoDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro no banco: " + e.getMessage());
         }
+        AuditoriaDAO.registrar(AuditoriaDAO.CONSULTA, "Vacina", null, "Listagem de vacinas: " + lista.size() + " registro(s)");
         return lista;
     }
 
     // Busca uma aplicação pelo id (retorna null se não existir)
     public Aplicacao buscarPorId(Integer id) {
+        Aplicacao aplicacao = buscar(id);
+        AuditoriaDAO.registrar(AuditoriaDAO.CONSULTA, "Vacina", id, aplicacao == null ? "Consulta por id: não encontrado" : "Consulta por id: " + AuditoriaDAO.resumo(campos(aplicacao)));
+        return aplicacao;
+    }
+
+    // Busca sem gerar log (usada para guardar o "antes" das alterações)
+    private Aplicacao buscar(Integer id) {
         try (Connection con = Conexao.conectar();
              PreparedStatement ps = con.prepareStatement(SELECT_BASE + "WHERE a.id = ?")) {
 
@@ -71,6 +81,7 @@ public class AplicacaoDAO {
             try (ResultSet chaves = ps.getGeneratedKeys()) {
                 if (chaves.next()) aplicacao.setId(chaves.getInt(1));
             }
+            AuditoriaDAO.registrar(AuditoriaDAO.INCLUSAO, "Vacina", aplicacao.getId(), "Registro incluído:\n" + AuditoriaDAO.lista(campos(aplicacao)));
             return true;
         } catch (SQLException e) {
             throw new RuntimeException("Erro no banco: " + e.getMessage());
@@ -90,7 +101,10 @@ public class AplicacaoDAO {
             ps.setString(4, aplicacao.getQuemAplicou());
             ps.setInt(5, aplicacao.getId());
 
-            return ps.executeUpdate() > 0;
+            Map<String, String> antes = campos(buscar(aplicacao.getId()));
+            boolean ok = ps.executeUpdate() > 0;
+            if (ok) AuditoriaDAO.registrar(AuditoriaDAO.ALTERACAO, "Vacina", aplicacao.getId(), "Campos alterados:\n" + AuditoriaDAO.diferencas(antes, campos(aplicacao)));
+            return ok;
         } catch (SQLException e) {
             throw new RuntimeException("Erro no banco: " + e.getMessage());
         }
@@ -104,7 +118,10 @@ public class AplicacaoDAO {
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
+            Map<String, String> antes = campos(buscar(id));
+            boolean ok = ps.executeUpdate() > 0;
+            if (ok) AuditoriaDAO.registrar(AuditoriaDAO.EXCLUSAO, "Vacina", id, "Registro excluído:\n" + AuditoriaDAO.lista(antes));
+            return ok;
         } catch (SQLException e) {
             throw new RuntimeException("Erro no banco: " + e.getMessage());
         }
@@ -139,5 +156,18 @@ public class AplicacaoDAO {
                 rs.getString("proxima_vacina"),
                 rs.getString("quem_aplicou")
         );
+    }
+
+    // Campos da vacinação para o log de auditoria
+    private Map<String, String> campos(Aplicacao a) {
+        Map<String, String> m = new LinkedHashMap<>();
+        if (a == null) return m;
+        Gado g = a.getGado();
+        m.put("Animal", g == null ? "" : "id " + g.getId() + (g.getNome() == null ? "" : " - " + g.getNome()));
+        m.put("Vacina", a.getVacina());
+        m.put("Data da aplicação", a.getDataAplicacao());
+        m.put("Próxima vacina", a.getProximaVacina());
+        m.put("Aplicado por", a.getQuemAplicou());
+        return m;
     }
 }

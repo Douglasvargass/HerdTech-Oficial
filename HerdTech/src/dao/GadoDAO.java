@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class GadoDAO {
 
@@ -31,11 +33,19 @@ public class GadoDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Erro no banco: " + e.getMessage());
         }
+        AuditoriaDAO.registrar(AuditoriaDAO.CONSULTA, "Animal", null, "Listagem de animais: " + lista.size() + " registro(s)");
         return lista;
     }
 
     // Busca um gado pelo id (retorna null se não existir)
     public Gado buscarPorId(Integer id) {
+        Gado gado = buscar(id);
+        AuditoriaDAO.registrar(AuditoriaDAO.CONSULTA, "Animal", id, gado == null ? "Consulta por id: não encontrado" : "Consulta por id: " + AuditoriaDAO.resumo(campos(gado)));
+        return gado;
+    }
+
+    // Busca sem gerar log (usada para guardar o "antes" das alterações)
+    private Gado buscar(Integer id) {
         try (Connection con = Conexao.conectar();
              PreparedStatement ps = con.prepareStatement(SELECT_BASE + "WHERE g.id = ?")) {
 
@@ -67,6 +77,7 @@ public class GadoDAO {
             try (ResultSet chaves = ps.getGeneratedKeys()) {
                 if (chaves.next()) gado.setId(chaves.getInt(1));
             }
+            AuditoriaDAO.registrar(AuditoriaDAO.INCLUSAO, "Animal", gado.getId(), "Registro incluído:\n" + AuditoriaDAO.lista(campos(gado)));
             return true;
         } catch (SQLException e) {
             throw new RuntimeException("Erro no banco: " + e.getMessage());
@@ -87,7 +98,10 @@ public class GadoDAO {
             ps.setString(5, gado.getDataNasc());
             ps.setInt(6, gado.getId());
 
-            return ps.executeUpdate() > 0;
+            Map<String, String> antes = campos(buscar(gado.getId()));
+            boolean ok = ps.executeUpdate() > 0;
+            if (ok) AuditoriaDAO.registrar(AuditoriaDAO.ALTERACAO, "Animal", gado.getId(), "Campos alterados:\n" + AuditoriaDAO.diferencas(antes, campos(gado)));
+            return ok;
         } catch (SQLException e) {
             throw new RuntimeException("Erro no banco: " + e.getMessage());
         }
@@ -101,7 +115,10 @@ public class GadoDAO {
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
+            Map<String, String> antes = campos(buscar(id));
+            boolean ok = ps.executeUpdate() > 0;
+            if (ok) AuditoriaDAO.registrar(AuditoriaDAO.EXCLUSAO, "Animal", id, "Registro excluído:\n" + AuditoriaDAO.lista(antes));
+            return ok;
         } catch (SQLException e) {
             throw new RuntimeException("Erro no banco: " + e.getMessage());
         }
@@ -126,5 +143,18 @@ public class GadoDAO {
                 rs.getString("genero"),
                 rs.getString("data_nasc")
         );
+    }
+
+    // Campos do animal para o log de auditoria
+    private Map<String, String> campos(Gado g) {
+        Map<String, String> m = new LinkedHashMap<>();
+        if (g == null) return m;
+        m.put("Nome", g.getNome());
+        m.put("Raça", g.getRaca());
+        m.put("Gênero", g.getGenero());
+        m.put("Nascimento", g.getDataNasc());
+        Cliente d = g.getDono();
+        m.put("Dono", d == null ? "" : "id " + d.getId() + (d.getNome() == null ? "" : " - " + d.getNome()));
+        return m;
     }
 }
