@@ -1,0 +1,29 @@
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f4f7f9;
+  color: #1e293b;
+}
+
+.tab-active {
+  background-color: #e6f7ed;
+  color: #059669;
+  font-weight: 600;
+}
+
+.tab-inactive {
+  color: #475569;
+  font-weight: 500;
+}
+
+.tab-inactive:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.selected-row {
+  background-color: #ecfdf5 !important;
+}
+
+.logo-blend {
+  mix-blend-mode: multiply;
+}
