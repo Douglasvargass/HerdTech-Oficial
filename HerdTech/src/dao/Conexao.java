@@ -12,8 +12,8 @@ public class Conexao {
     private static final String URL = "jdbc:postgresql://ep-summer-leaf-b6p0fxz2-pooler.c-2.sa-east-1.aws.neon.tech:5432/herdtechdb";
     private static final String USUARIO = "neondb_owner";
 
-    // A senha é digitada numa janela e fica guardada só enquanto o programa está aberto
-    private static String senha = System.getenv("HERDTECH_SENHA");
+    // Senha padrão do banco do grupo (se ficar null, o programa pede a senha numa janela)
+    private static String senha = "npg_colqk0pdjgx2";
 
     // Abre uma nova conexão com o banco
     public static Connection conectar() throws SQLException {
