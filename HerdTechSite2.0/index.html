@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HerdTech - Gestão Inteligente de Rebanho</title>
+  <!-- App instalável (PWA) -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#059669" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="HerdTech" />
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons via CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Fonte Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Estilos Customizados -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- HEADER / NAVBAR -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+    <div class="max-w-[1440px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+
+      <!-- Logo Oficial HerdTech -->
+      <div class="flex items-center gap-2 cursor-pointer" onclick="switchTab('inicio')">
+        <img src="logo.png" alt="HerdTech" class="h-10 w-auto object-contain logo-blend" onerror="this.onerror=null;this.style.display='none'">
+      </div>
+
+      <!-- Menu Central -->
+      <nav class="hidden lg:flex items-center gap-2">
+        <button onclick="switchTab('inicio')" id="nav-inicio" class="tab-active flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition">
+          <i data-lucide="home" class="w-4 h-4"></i> Início
+        </button>
+        <button onclick="switchTab('fazendas')" id="nav-fazendas" class="tab-inactive flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition">
+          <i data-lucide="map-pin" class="w-4 h-4"></i> Fazendas
+        </button>
+        <button onclick="switchTab('animais')" id="nav-animais" class="tab-inactive flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition">
+          <i data-lucide="beef" class="w-4 h-4"></i> Animais
+        </button>
+        <button onclick="switchTab('vacinacao')" id="nav-vacinacao" class="tab-inactive flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition">
+          <i data-lucide="syringe" class="w-4 h-4"></i> Vacinação
+        </button>
+        <button onclick="switchTab('relatorios')" id="nav-relatorios" class="tab-inactive flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition">
+          <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Relatórios
+        </button>
+      </nav>
+
+      <!-- Notificações e Perfil -->
+      <div class="flex items-center gap-3 sm:gap-4">
+        <!-- Instalar como aplicativo (aparece só quando o navegador permite) -->
+        <div class="relative">
+          <button id="btn-instalar" type="button" onclick="instalarApp()" class="hidden items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition" title="Instalar o HerdTech como aplicativo">
+            <i data-lucide="download" class="w-4 h-4"></i> <span>Instalar<span class="hidden sm:inline"> app</span></span>
+          </button>
+          <div id="dica-instalar" class="hidden absolute right-0 top-11 w-72 bg-white border border-slate-200 shadow-lg rounded-xl p-4 text-xs text-slate-600 z-40"></div>
+        </div>
+        <div class="relative cursor-pointer" onclick="switchTab('vacinacao')" title="Doses pendentes">
+          <i data-lucide="bell" class="w-5 h-5 text-slate-600"></i>
+          <span id="badge-notificacao" class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">1</span>
+        </div>
+        <div class="hidden sm:block h-6 w-px bg-slate-200"></div>
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-full text-white font-bold bg-[#002f56] flex items-center justify-center text-sm">G</div>
+          <div class="hidden sm:block leading-tight">
+            <p class="text-xs font-bold text-slate-800">Guilherme</p>
+            <p class="text-[11px] text-slate-400">Administrador</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 py-5 sm:py-6">
+
+    <!-- ==================== ABA: INÍCIO ==================== -->
+    <section id="view-inicio" class="space-y-6">
+
+      <!-- Banner Principal -->
+      <div class="bg-gradient-to-r from-white via-[#f7fcf9] to-[#ecf9f1] border border-slate-200/80 rounded-2xl p-5 sm:p-8 flex flex-col md:flex-row items-center justify-between shadow-sm">
+        <div class="space-y-4 max-w-xl">
+          <span class="inline-block bg-emerald-100 text-emerald-700 text-[11px] font-bold px-3 py-1 rounded-full tracking-wide uppercase">
+            Tecnologia no Campo
+          </span>
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold leading-tight text-[#002f56]">
+            Gestão inteligente<br>
+            Tecnologia para um<br>
+            <span class="text-emerald-600">rebanho mais produtivo</span>
+          </h1>
+          <p class="text-slate-500 text-sm">
+            Controle completo do seu rebanho, fazendas e histórico sanitário em um só lugar.
+          </p>
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <button onclick="switchTab('animais'); openModal('animal');" class="hover:bg-emerald-700 bg-emerald-600 text-white font-semibold text-sm px-4 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i> Cadastrar Animal
+            </button>
+            <button onclick="switchTab('fazendas'); openModal('cliente');" class="bg-[#002f56] hover:bg-slate-900 text-white font-semibold text-sm px-4 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition">
+              <i data-lucide="map-pin" class="w-4 h-4"></i> Cadastrar Fazenda
+            </button>
+            <button onclick="switchTab('vacinacao'); openModal('vacina');" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold text-sm px-4 py-2.5 rounded-lg flex items-center gap-2 transition">
+              <i data-lucide="syringe" class="w-4 h-4"></i> Aplicar Vacina
+            </button>
+          </div>
+        </div>
+
+        <!-- Logo Grande à Direita -->
+        <div class="flex flex-col items-center mt-6 md:mt-0 md:mr-8 gap-4">
+          <img src="logo.png" alt="HerdTech Logo" class="w-48 h-auto object-contain logo-blend" onerror="this.onerror=null;this.style.display='none'">
+          <div class="bg-[#002f56] text-white rounded-xl px-5 py-3 text-xs space-y-1 shadow-md w-44">
+            <div class="flex items-center gap-2 text-slate-200"><span class="text-emerald-400 font-bold">+</span> Produtividade</div>
+            <div class="flex items-center gap-2 text-slate-200 border-b border-slate-700 pb-1.5"><span class="text-slate-400 font-bold">−</span> Custo</div>
+            <div class="flex items-center gap-2 text-emerald-400 font-bold pt-0.5"><span>=</span> Mais Lucro</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cards KPI -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div class="bg-white border border-slate-200/80 rounded-xl p-5 flex items-center gap-4 shadow-sm">
+          <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <i data-lucide="beef" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500 font-medium">Total de Animais</p>
+            <p id="kpi-animais" class="text-2xl font-extrabold text-slate-800 my-0.5">1</p>
+            <span class="inline-block bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Geral</span>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200/80 rounded-xl p-5 flex items-center gap-4 shadow-sm">
+          <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <i data-lucide="map-pin" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500 font-medium">Fazendas</p>
+            <p id="kpi-fazendas" class="text-2xl font-extrabold text-slate-800 my-0.5">1</p>
+            <span class="inline-block bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Ativas</span>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200/80 rounded-xl p-5 flex items-center gap-4 shadow-sm">
+          <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <i data-lucide="user" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500 font-medium">Clientes</p>
+            <p id="kpi-clientes" class="text-2xl font-extrabold text-slate-800 my-0.5">1</p>
+            <span class="inline-block bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Produtores</span>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200/80 rounded-xl p-5 flex items-center gap-4 shadow-sm">
+          <div class="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+            <i data-lucide="syringe" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500 font-medium">Total de Vacinas</p>
+            <p id="kpi-vacinas" class="text-2xl font-extrabold text-slate-800 my-0.5">2</p>
+            <span class="inline-block bg-sky-100 text-sky-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Aplicadas</span>
+          </div>
+        </div>
+
+        <div class="bg-white border border-slate-200/80 rounded-xl p-5 flex items-center gap-4 shadow-sm">
+          <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center">
+            <i data-lucide="calendar" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500 font-medium">Doses Pendentes</p>
+            <p id="kpi-pendentes" class="text-2xl font-extrabold text-slate-800 my-0.5">1</p>
+            <span class="inline-block bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded-full">Próximos 30 dias</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Painéis Inferiores -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Próximas Vacinações -->
+        <div class="bg-white border border-slate-200/80 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-start justify-between mb-4">
+              <div>
+                <h2 class="text-base font-bold text-slate-800">Próximas Vacinações</h2>
+                <p class="text-xs text-slate-400">Doses atrasadas e dos próximos 30 dias</p>
+              </div>
+              <button onclick="switchTab('vacinacao')" class="text-xs font-bold text-emerald-600 hover:underline">Ver todas</button>
+            </div>
+            <div id="lista-proximas-vacinas" class="space-y-3"></div>
+          </div>
+        </div>
+
+        <!-- Composição do Rebanho -->
+        <div class="bg-white border border-slate-200/80 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="mb-5">
+              <h2 class="text-base font-bold text-slate-800">Composição do Rebanho</h2>
+              <p class="text-xs text-slate-400">Quantidade de animais por raça</p>
+            </div>
+            <div id="composicao-racas" class="space-y-3"></div>
+          </div>
+          <div class="pt-6 mt-6 border-t border-slate-100 flex items-center gap-4 text-xs text-slate-500">
+            <span>Fêmeas: <strong id="count-femeas" class="text-slate-800">1</strong></span>
+            <span>•</span>
+            <span>Machos: <strong id="count-machos" class="text-slate-800">0</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ABA: FAZENDAS ==================== -->
+    <section id="view-fazendas" class="hidden space-y-5">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-extrabold text-slate-800">Clientes e Fazendas</h1>
+          <p class="text-xs text-slate-500">Cadastre os produtores e as fazendas onde o rebanho é criado.</p>
+        </div>
+        <button onclick="openModal('cliente')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-4 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition self-start">
+          <i data-lucide="plus" class="w-4 h-4"></i> Novo Cliente
+        </button>
+      </div>
+
+      <div class="bg-white border border-slate-200/80 rounded-xl shadow-sm overflow-hidden min-h-[520px] flex flex-col">
+        <div class="p-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3 w-full sm:w-auto">
+            <div class="relative flex-1 sm:flex-none">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+              <input type="text" id="search-clientes" onkeyup="renderClientes()" placeholder="Pesquisar..." class="pl-9 pr-4 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 w-full sm:w-64">
+            </div>
+            <span id="count-reg-clientes" class="text-xs text-slate-500">1 registro</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="renderAll()" class="hover:bg-emerald-50 font-semibold text-xs px-3 py-2 rounded-lg flex items-center gap-1.5 transition text-[#002f56]">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Atualizar
+            </button>
+            <button onclick="editSelected('cliente')" id="btn-edit-cliente" disabled class="border border-slate-200 text-slate-400 disabled:opacity-60 enabled:text-slate-700 enabled:hover:bg-slate-50 font-semibold text-xs px-3 py-2 rounded-lg flex items-center gap-1.5 transition">
+              <i data-lucide="pencil" class="w-3.5 h-3.5"></i> Editar
+            </button>
+            <button onclick="deleteSelected('cliente')" id="btn-del-cliente" disabled class="bg-red-300 enabled:bg-red-500 enabled:hover:bg-red-600 text-white font-semibold text-xs px-3 py-2 rounded-lg flex items-center gap-1.5 transition">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Excluir
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto flex-1">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <th class="py-3 px-4">ID</th>
+                <th class="py-3 px-4">Nome</th>
+                <th class="py-3 px-4">CPF</th>
+                <th class="py-3 px-4">Nascimento</th>
+                <th class="py-3 px-4">Fazenda</th>
+                <th class="py-3 px-4">Endereço</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-clientes" class="divide-y divide-slate-100 text-xs text-slate-700"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ABA: ANIMAIS ==================== -->
+    <section id="view-animais" class="hidden space-y-5">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-extrabold text-slate-800">Animais</h1>
+          <p class="text-xs text-slate-500">Controle do rebanho: raça, gênero, idade e a qual fazenda cada animal pertence.</p>
+        </div>
+        <button onclick="openModal('animal')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-4 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition self-start">
+          <i data-lucide="plus" class="w-4 h-4"></i> Novo Animal
+        </button>
+      </div>
+
+      <div class="bg-white border border-slate-200/80 rounded-xl shadow-sm overflow-hidden min-h-[520px] flex flex-col">
+        <div class="p-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3 w-full sm:w-auto">
+            <div class="relative flex-1 sm:flex-none">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+              <input type="text" id="search-animais" onkeyup="renderAnimais()" placeholder="Pesquisar..." class="pl-9 pr-4 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 w-full sm:w-64">
+            </div>
+            <span id="count-reg-animais" class="text-xs text-slate-500">1 registro</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="renderAll()" class="hover:bg-emerald-50 font-semibold text-xs px-3 py-2 rounded-lg flex items-center gap-1.5 transition text-[#002f56]">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Atualizar
+            </button>
+            <button onclick="editSelected('animal')" id="btn-edit-animal" disabled class="border border-slate-200 text-slate-400 disabled:opacity-60 enabled:text-slate-700 enabled:hover:bg-slate-50 font-semibold text-xs px-3 py-2 rounded-lg flex items-center gap-1.5 transition">
+              <i data-lucide="pencil" class="w-3.5 h-3.5"></i> Editar
+            </button>
+            <button onclick="deleteSelected('animal')" id="btn-del-animal" disabled class="bg-red-300 enabled:bg-red-500 enabled:hover:bg-red-600 text-white font-semibold text-xs px-3 py-2 rounded-lg flex items-center gap-1.5 transition">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Excluir
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto flex-1">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <th class="py-3 px-4">ID</th>
+                <th class="py-3 px-4">Apelido</th>
+                <th class="py-3 px-4">Raça</th>
+                <th class="py-3 px-4">Gênero</th>
+                <th class="py-3 px-4">Nascimento</th>
+                <th class="py-3 px-4">Idade</th>
+                <th class="py-3 px-4">Dono</th>
+                <th class="py-3 px-4">Fazenda</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-animais" class="divide-y divide-slate-100 text-xs text-slate-700"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ABA: VACINAÇÃO ==================== -->
+    <section id="view-vacinacao" class="hidden space-y-5">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-extrabold text-slate-800">Vacinação</h1>
+          <p class="text-xs text-slate-500">Histórico sanitário do rebanho e agenda das próximas doses.</p>
+        </div>
+        <button onclick="openModal('vacina')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-4 py-2.5 rounded-lg flex items-center gap-2 shadow-sm transition self-start">
+          <i data-lucide="plus" class="w-4 h-4"></i> Aplicar Vacina
+        </button>
+      </div>
+
+      <div class="bg-white border border-slate-200/80 rounded-xl shadow-sm overflow-hidden min-h-[520px] flex flex-col">
+        <div class="p-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3 w-full sm:w-auto">
+            <div class="relative flex-1 sm:flex-none">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-2.5"></i>
+              <input type="text" id="search-vacinas" onkeyup="renderVacinas()" placeholder="Pesquisar..." class="pl-9 pr-4 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500 w-full sm:w-64">
+            </div>
+            <span id="count-reg-vacinas" class="text-xs text-slate-500">2 registros</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="renderAll()" class="hover:bg-emerald-50 font-semibold text-xs px-3 py-2 rounded-lg flex items-center gap-1.5 transition text-[#002f56]">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Atualizar
+            </button>
+            <button onclick="editSelected('vacina')" id="btn-edit-vacina" disabled class="border border-slate-200 text-slate-400 disabled:opacity-60 enabled:text-slate-700 enabled:hover:bg-slate-50 font-semibold text-xs px-3 py-2 rounded-lg flex items-center gap-1.5 transition">
+              <i data-lucide="pencil" class="w-3.5 h-3.5"></i> Editar
+            </button>
+            <button onclick="deleteSelected('vacina')" id="btn-del-vacina" disabled class="bg-red-300 enabled:bg-red-500 enabled:hover:bg-red-600 text-white font-semibold text-xs px-3 py-2 rounded-lg flex items-center gap-1.5 transition">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Excluir
+            </button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto flex-1">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <th class="py-3 px-4">ID</th>
+                <th class="py-3 px-4">Animal</th>
+                <th class="py-3 px-4">Dono</th>
+                <th class="py-3 px-4">Vacina</th>
+                <th class="py-3 px-4">Aplicada Em</th>
+                <th class="py-3 px-4">Próxima Dose</th>
+                <th class="py-3 px-4">Prazo</th>
+                <th class="py-3 px-4">Aplicado Por</th>
+                <th class="py-3 px-4">Situação</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-vacinas" class="divide-y divide-slate-100 text-xs text-slate-700"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ABA: RELATÓRIOS ==================== -->
+    <section id="view-relatorios" class="hidden space-y-5">
+      <div>
+        <h1 class="text-2xl font-extrabold text-slate-800">Relatórios</h1>
+        <p class="text-xs text-slate-500">Visão geral do rebanho e da situação sanitária.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white border border-slate-200/80 rounded-xl p-6 shadow-sm">
+          <h2 class="text-base font-bold text-slate-800">Animais por Fazenda</h2>
+          <p class="text-xs text-slate-400 mb-5">Distribuição do rebanho entre as propriedades</p>
+          <div id="rel-animais-fazenda" class="space-y-4"></div>
+        </div>
+
+        <div class="bg-white border border-slate-200/80 rounded-xl p-6 shadow-sm">
+          <h2 class="text-base font-bold text-slate-800">Situação Sanitária</h2>
+          <p class="text-xs text-slate-400 mb-5">Dose mais recente de cada animal / vacina</p>
+          <div id="rel-situacao-sanitaria" class="space-y-4"></div>
+        </div>
+
+        <div class="bg-white border border-slate-200/80 rounded-xl p-6 shadow-sm">
+          <h2 class="text-base font-bold text-slate-800">Composição por Raça</h2>
+          <p class="text-xs text-slate-400 mb-5">Quantidade de animais de cada raça</p>
+          <div id="rel-composicao-raca" class="space-y-4"></div>
+        </div>
+
+        <div class="bg-white border border-slate-200/80 rounded-xl p-6 shadow-sm">
+          <h2 class="text-base font-bold text-slate-800">Vacinas mais Aplicadas</h2>
+          <p class="text-xs text-slate-400 mb-5">Total de aplicações registradas por vacina</p>
+          <div id="rel-vacinas-aplicadas" class="space-y-4"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-slate-200/80 py-3 px-4 sm:px-6 mb-16 lg:mb-0 text-[11px] text-slate-400">
+    <div class="max-w-[1440px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+        <span>Conectado ao banco de dados</span>
+        <span>•</span>
+        <span id="footer-stats">1 clientes, 1 animais, 2 vacinas</span>
+      </div>
+      <div>
+        HerdTech © 2026 • Tecnologia no campo
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== BARRA DE ABAS (CELULAR E TABLET) ==================== -->
+  <nav class="barra-abas lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-slate-200 grid grid-cols-5 shadow-[0_-2px_10px_rgba(15,23,42,0.05)]" aria-label="Menu principal">
+    <button data-aba="inicio" onclick="switchTab('inicio')" class="aba-ativa flex flex-col items-center justify-center gap-1 pt-2 pb-1.5 text-[11px]">
+      <i data-lucide="home" class="w-5 h-5"></i> Início
+    </button>
+    <button data-aba="fazendas" onclick="switchTab('fazendas')" class="flex flex-col items-center justify-center gap-1 pt-2 pb-1.5 text-[11px]">
+      <i data-lucide="map-pin" class="w-5 h-5"></i> Fazendas
+    </button>
+    <button data-aba="animais" onclick="switchTab('animais')" class="flex flex-col items-center justify-center gap-1 pt-2 pb-1.5 text-[11px]">
+      <i data-lucide="beef" class="w-5 h-5"></i> Animais
+    </button>
+    <button data-aba="vacinacao" onclick="switchTab('vacinacao')" class="flex flex-col items-center justify-center gap-1 pt-2 pb-1.5 text-[11px]">
+      <i data-lucide="syringe" class="w-5 h-5"></i> Vacinação
+    </button>
+    <button data-aba="relatorios" onclick="switchTab('relatorios')" class="flex flex-col items-center justify-center gap-1 pt-2 pb-1.5 text-[11px]">
+      <i data-lucide="bar-chart-2" class="w-5 h-5"></i> Relatórios
+    </button>
+  </nav>
+
+  <!-- ==================== MODAL ESTILIZADO ==================== -->
+  <div id="modal-overlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full max-h-[92vh] overflow-y-auto border border-slate-200">
+      <div class="h-1.5 bg-emerald-600 w-full"></div>
+
+      <div class="p-6 space-y-5">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <div id="modal-icon-box" class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <i id="modal-icon" data-lucide="user-plus" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 id="modal-title" class="text-lg font-bold text-slate-800 leading-tight">Novo Cliente</h3>
+              <p id="modal-subtitle" class="text-xs text-slate-400 mt-0.5">Preencha os dados do produtor e da fazenda.</p>
+            </div>
+          </div>
+          <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg transition">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <form id="modal-form" onsubmit="saveForm(event)" class="space-y-4">
+          <div id="modal-fields" class="space-y-3.5"></div>
+          <p id="modal-error" class="hidden text-xs font-semibold text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2"></p>
+
+          <div class="flex justify-end items-center gap-2.5 pt-4 border-t border-slate-100">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg transition">
+              Cancelar
+            </button>
+            <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg flex items-center gap-1.5 shadow-xs transition">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i> Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts Modularizados -->
+  <script src="js/storage.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/pwa.js"></script>
+</body>
+</html>
